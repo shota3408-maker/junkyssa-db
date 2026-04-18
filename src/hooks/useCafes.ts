@@ -44,10 +44,10 @@ export function useCafes(filters?: SearchFilters) {
 
   useEffect(() => {
     setLoading(true);
-    let q = query(collection(db, COLLECTIONS.CAFES), orderBy('overallScore', 'desc'), limit(500));
+    let q = query(collection(db, COLLECTIONS.CAFES), orderBy('overallScore', 'desc'), limit(2000));
 
     if (filters?.prefecture) {
-      q = query(collection(db, COLLECTIONS.CAFES), where('prefecture', '==', filters.prefecture), limit(500));
+      q = query(collection(db, COLLECTIONS.CAFES), where('prefecture', '==', filters.prefecture), limit(2000));
     }
 
     const unsub = onSnapshot(q, (snap) => {

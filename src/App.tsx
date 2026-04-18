@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { TopPage } from './pages/TopPage';
+import { CoffeeCupIcon } from './components/CoffeeCupIcon';
 import { MyPage } from './pages/MyPage';
 import { CafeDetailPage } from './pages/CafeDetailPage';
 import { ReviewFormPage } from './pages/ReviewFormPage';
@@ -64,7 +65,7 @@ function AppInner() {
     <>
       {!isDetailPage && (
         <div className="site-header">
-          <img src="/favicon.png" alt="純喫茶DB" style={{ width: 36, height: 36, borderRadius: 8 }} />
+          <CoffeeCupIcon size={36} />
           <div className="header-actions">
             {profile?.role === 'admin' && (
               <button className="btn-header" onClick={() => navigate('/admin')}>管理</button>
