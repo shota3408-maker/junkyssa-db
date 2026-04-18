@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { TopPage } from './pages/TopPage';
+import { MyPage } from './pages/MyPage';
 import { CafeDetailPage } from './pages/CafeDetailPage';
 import { ReviewFormPage } from './pages/ReviewFormPage';
 import { AdminPage } from './pages/AdminPage';
@@ -75,6 +76,7 @@ function AppInner() {
 
       <Routes>
         <Route path="/"               element={<TopPage />} />
+        <Route path="/mypage"         element={<MyPage />} />
         <Route path="/cafe/:id"       element={<CafeDetailPage />} />
         <Route path="/review/new/:id" element={<ReviewFormPage user={user} />} />
         <Route path="/admin"          element={<AdminPage profile={profile} />} />
