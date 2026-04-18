@@ -64,7 +64,7 @@ function AppInner() {
     <>
       {!isDetailPage && (
         <div className="site-header">
-          <div className="site-logo">純喫茶<span>DB</span></div>
+          <img src="/favicon.png" alt="純喫茶DB" style={{ width: 36, height: 36, borderRadius: 8 }} />
           <div className="header-actions">
             {profile?.role === 'admin' && (
               <button className="btn-header" onClick={() => navigate('/admin')}>管理</button>
