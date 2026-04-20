@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useFavorites, MyList } from '../hooks/useFavorites';
 import { db, collection, query, where, getDocs, doc, getDoc, COLLECTIONS } from '../firebase';
+import { useVisits } from '../hooks/useVisits';
 import { Cafe, Review } from '../types';
 
 const EMOJIS = ['☕', '🍰', '📍', '⭐', '🕰️', '🪑', '🎵', '🌿', '🏠', '💛'];
@@ -45,10 +46,12 @@ export function MyPage() {
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
   const { favoriteIds, lists, toggleFavorite, createList, deleteList, toggleCafeInList } = useFavorites(user);
+  const { visitedIds, visitedDates, toggleVisit } = useVisits(user);
   const [favCafes, setFavCafes] = useState<Cafe[]>([]);
+  const [visitedCafes, setVisitedCafes] = useState<Cafe[]>([]);
   const [listCafes, setListCafes] = useState<Record<string, Cafe[]>>({});
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [openSection, setOpenSection] = useState<'fav' | string | 'reviews' | null>('fav');
+  const [openSection, setOpenSection] = useState<'fav' | 'visited' | string | 'reviews' | null>('fav');
   const [showNewList, setShowNewList] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [newListEmoji, setNewListEmoji] = useState('☕');
@@ -71,6 +74,11 @@ export function MyPage() {
     setLoadingFavs(true);
     fetchCafesByIds(favoriteIds).then((c) => { setFavCafes(c); setLoadingFavs(false); });
   }, [favoriteIds.join(',')]);
+
+  useEffect(() => {
+    if (!visitedIds.length) { setVisitedCafes([]); return; }
+    fetchCafesByIds(visitedIds).then(setVisitedCafes);
+  }, [visitedIds.join(',')]);
 
   useEffect(() => {
     lists.forEach(async (list) => {
@@ -112,7 +120,11 @@ export function MyPage() {
           : <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--acc)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto' }}>☕</div>
         }
         <div style={{ fontFamily: 'Noto Serif JP, serif', fontSize: 18, fontWeight: 700, color: '#FDF6E3', marginTop: 12 }}>{profile.displayName}</div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginTop: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 16 }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--acc)' }}>{visitedIds.length}</div>
+            <div style={{ fontSize: 11, color: 'rgba(253,246,227,.7)' }}>行った</div>
+          </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--acc)' }}>{profile.reviewCount}</div>
             <div style={{ fontSize: 11, color: 'rgba(253,246,227,.7)' }}>口コミ</div>
@@ -142,6 +154,37 @@ export function MyPage() {
             )}
             {favCafes.map((cafe) => (
               <CafeMiniCard key={cafe.id} cafe={cafe} onRemove={() => toggleFavorite(cafe.id)} />
+            ))}
+          </div>
+        )}
+
+        {/* 📍 行った純喫茶 */}
+        <SectionHeader id="visited" emoji="📍" title="行った純喫茶" count={visitedIds.length} />
+        {openSection === 'visited' && (
+          <div style={{ paddingBottom: 8 }}>
+            {visitedIds.length === 0 && (
+              <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--txt-s)', fontSize: 14 }}>
+                店舗詳細ページの「行ったことがある」ボタンで記録できます
+              </div>
+            )}
+            {visitedCafes.map((cafe) => (
+              <div key={cafe.id} style={{ display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--line)', cursor: 'pointer' }} onClick={() => navigate(`/cafe/${cafe.id}`)}>
+                {(cafe.coverPhoto || cafe.googlePhotos?.[0])
+                  ? <img src={cafe.coverPhoto || cafe.googlePhotos?.[0]} alt={cafe.name} style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover', flexShrink: 0, marginRight: 12 }} />
+                  : <div style={{ width: 52, height: 52, borderRadius: 8, background: 'var(--pri-lt)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0, marginRight: 12 }}>☕</div>
+                }
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--txt-m)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cafe.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--txt-s)', marginTop: 2 }}>
+                    📍 {cafe.prefecture}{cafe.city}
+                    {visitedDates[cafe.id] && <span style={{ marginLeft: 8, color: 'var(--acc)', fontWeight: 700 }}>· {visitedDates[cafe.id]}</span>}
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleVisit(cafe.id); }}
+                  style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--txt-s)', padding: '4px 8px' }}
+                >✕</button>
+              </div>
             ))}
           </div>
         )}

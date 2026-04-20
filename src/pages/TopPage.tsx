@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCafes } from '../hooks/useCafes';
 import { useFavorites } from '../hooks/useFavorites';
+import { useVisits } from '../hooks/useVisits';
 import { Cafe, SCORE_LABELS, POPULAR_TAGS, SearchFilters } from '../types';
 
 const PER_PAGE = 30;
@@ -13,7 +14,7 @@ function ScoreBadge({ emoji, value }: { emoji: string; value: number }) {
   return <div className="score-badge">{emoji} {value.toFixed(1)}</div>;
 }
 
-function CafeCard({ cafe, isFav, onToggleFav }: { cafe: Cafe; isFav: boolean; onToggleFav: (id: string) => void }) {
+function CafeCard({ cafe, isFav, onToggleFav, isVisited }: { cafe: Cafe; isFav: boolean; onToggleFav: (id: string) => void; isVisited: boolean }) {
   const navigate = useNavigate();
   const photo = cafe.coverPhoto || cafe.googlePhotos?.[0];
   return (
@@ -22,6 +23,11 @@ function CafeCard({ cafe, isFav, onToggleFav }: { cafe: Cafe; isFav: boolean; on
         ? <img src={photo} alt={cafe.name} className="cafe-card-photo" />
         : <div className="cafe-card-photo">☕</div>
       }
+      {isVisited && (
+        <div style={{ position: 'absolute', top: 10, left: 10, background: 'var(--acc)', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, boxShadow: '0 1px 4px rgba(0,0,0,.25)' }}>
+          ✓ 行った
+        </div>
+      )}
       <button
         onClick={(e) => { e.stopPropagation(); onToggleFav(cafe.id); }}
         style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(255,255,255,.85)', border: 'none', borderRadius: '50%', width: 34, height: 34, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,.2)' }}
@@ -54,6 +60,7 @@ export function TopPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { favoriteIds, toggleFavorite } = useFavorites(user);
+  const { visitedIds } = useVisits(user);
   const [keyword, setKeyword] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [page, setPage] = useState(0);
@@ -119,6 +126,7 @@ export function TopPage() {
               cafe={cafe}
               isFav={favoriteIds.includes(cafe.id)}
               onToggleFav={toggleFavorite}
+              isVisited={visitedIds.includes(cafe.id)}
             />
           ))}
         </div>

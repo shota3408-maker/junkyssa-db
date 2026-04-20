@@ -3,6 +3,8 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCafe } from '../hooks/useCafes';
 import { useReviews } from '../hooks/useReviews';
+import { useAuth } from '../hooks/useAuth';
+import { useVisits } from '../hooks/useVisits';
 import { SCORE_LABELS } from '../types';
 
 function ScoreAxis({ field, value }: { field: string; value: number }) {
@@ -69,8 +71,12 @@ function ReviewCard({ review }: { review: any }) {
 export function CafeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { cafe, loading } = useCafe(id);
   const { reviews } = useReviews(id);
+  const { visitedIds, visitedDates, toggleVisit } = useVisits(user);
+  const isVisited = id ? visitedIds.includes(id) : false;
+  const visitDate = id ? visitedDates[id] : undefined;
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt-s)' }}>読み込み中...</div>;
   if (!cafe) return <div style={{ padding: 40, textAlign: 'center', color: 'var(--txt-s)' }}>店舗が見つかりません</div>;
@@ -127,6 +133,20 @@ export function CafeDetailPage() {
           <ScoreAxis field="timelessScore" value={cafe.timelessScore} />
           <ScoreAxis field="overallScore"  value={cafe.overallScore} />
         </div>
+
+        {/* 行った！ボタン */}
+        <button
+          onClick={() => id && toggleVisit(id)}
+          style={{
+            width: '100%', marginBottom: 12, border: `2px solid ${isVisited ? '#C8860A' : 'var(--line)'}`,
+            borderRadius: 12, padding: '13px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+            fontFamily: 'inherit', transition: 'all .2s',
+            background: isVisited ? 'var(--acc-lt)' : 'var(--card)',
+            color: isVisited ? 'var(--acc)' : 'var(--txt-s)',
+          }}
+        >
+          {isVisited ? `✓ 行ったことがある（${visitDate}）` : '📍 行ったことがある'}
+        </button>
 
         {/* 口コミ投稿ボタン */}
         <button className="btn-pri" style={{ marginBottom: 24 }} onClick={() => navigate(`/review/new/${id}`)}>
