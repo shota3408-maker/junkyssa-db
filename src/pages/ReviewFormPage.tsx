@@ -123,24 +123,36 @@ export function ReviewFormPage({ user }: { user: any }) {
         </div>
 
         {/* 写真 */}
-        <div className="field">
-          <label>写真（任意・最大3枚）</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              const files = Array.from(e.target.files || []).slice(0, 3);
-              setPhotoFiles(files);
-            }}
-          />
-          {photoFiles.length > 0 && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-              {photoFiles.map((f, i) => (
-                <img key={i} src={URL.createObjectURL(f)} alt="" style={{ width: 72, height: 72, borderRadius: 8, objectFit: 'cover' }} />
-              ))}
-            </div>
-          )}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt-s)', marginBottom: 10 }}>📷 写真（任意・最大3枚）</div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {photoFiles.map((f, i) => (
+              <div key={i} style={{ position: 'relative' }}>
+                <img src={URL.createObjectURL(f)} alt="" style={{ width: 90, height: 90, borderRadius: 10, objectFit: 'cover', display: 'block' }} />
+                <button
+                  type="button"
+                  onClick={() => setPhotoFiles((prev) => prev.filter((_, j) => j !== i))}
+                  style={{ position: 'absolute', top: -8, right: -8, width: 24, height: 24, borderRadius: '50%', background: 'var(--pri)', border: 'none', color: 'white', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, lineHeight: 1 }}
+                >✕</button>
+              </div>
+            ))}
+            {photoFiles.length < 3 && (
+              <label style={{ width: 90, height: 90, borderRadius: 10, border: '2px dashed var(--line)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', gap: 4, color: 'var(--txt-s)' }}>
+                <span style={{ fontSize: 28 }}>📷</span>
+                <span style={{ fontSize: 11, fontWeight: 700 }}>追加</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setPhotoFiles((prev) => [...prev, file].slice(0, 3));
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+            )}
+          </div>
         </div>
 
         <button className="btn-pri" onClick={handleSubmit} disabled={!valid || saving}>
