@@ -5,6 +5,7 @@ import { useAuth } from './hooks/useAuth';
 import { TopPage } from './pages/TopPage';
 import { CoffeeCupIcon } from './components/CoffeeCupIcon';
 import { MyPage } from './pages/MyPage';
+import { MapPage } from './pages/MapPage';
 import { CafeDetailPage } from './pages/CafeDetailPage';
 import { ReviewFormPage } from './pages/ReviewFormPage';
 import { AdminPage } from './pages/AdminPage';
@@ -20,6 +21,7 @@ function BottomNav() {
 
   const items = [
     { icon: '☕', label: 'トップ', to: '/' },
+    { icon: '🗺️', label: 'マップ', to: '/map' },
     { icon: '👤', label: 'マイページ', to: '/mypage' },
   ];
 
@@ -127,6 +129,7 @@ function AppInner() {
 
       <Routes>
         <Route path="/"               element={<TopPage />} />
+        <Route path="/map"            element={<MapPage />} />
         <Route path="/mypage"         element={<MyPage />} />
         <Route path="/cafe/:id"       element={<CafeDetailPage />} />
         <Route path="/review/new/:id" element={<ReviewFormPage user={user} />} />
