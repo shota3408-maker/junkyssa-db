@@ -6,6 +6,7 @@ import { TopPage } from './pages/TopPage';
 import { CoffeeCupIcon } from './components/CoffeeCupIcon';
 import { MyPage } from './pages/MyPage';
 import { MapPage } from './pages/MapPage';
+import { RankingPage } from './pages/RankingPage';
 import { CafeDetailPage } from './pages/CafeDetailPage';
 import { ReviewFormPage } from './pages/ReviewFormPage';
 import { AdminPage } from './pages/AdminPage';
@@ -20,9 +21,10 @@ function BottomNav() {
   if (['/review', '/cafe', '/admin'].some((p) => path.startsWith(p))) return null;
 
   const items = [
-    { icon: '☕', label: 'トップ', to: '/' },
-    { icon: '🗺️', label: 'マップ', to: '/map' },
-    { icon: '👤', label: 'マイページ', to: '/mypage' },
+    { icon: '☕', label: 'トップ',        to: '/' },
+    { icon: '🗺️', label: 'マップ',       to: '/map' },
+    { icon: '🏆', label: 'ランキング',    to: '/ranking' },
+    { icon: '👤', label: 'マイページ',   to: '/mypage' },
   ];
 
   return (
@@ -130,6 +132,7 @@ function AppInner() {
       <Routes>
         <Route path="/"               element={<TopPage />} />
         <Route path="/map"            element={<MapPage />} />
+        <Route path="/ranking"        element={<RankingPage />} />
         <Route path="/mypage"         element={<MyPage />} />
         <Route path="/cafe/:id"       element={<CafeDetailPage />} />
         <Route path="/review/new/:id" element={<ReviewFormPage user={user} />} />
